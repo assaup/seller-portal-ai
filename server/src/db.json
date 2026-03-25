@@ -1,0 +1,85 @@
+{
+  "items": [
+    {
+      "id": "1",
+      "category": "electronics",
+      "title": "iPhone 13 Pro",
+      "description": "Отличное состояние, полный комплект",
+      "price": 65000,
+      "createdAt": "2024-03-01T10:00:00Z",
+      "params": {
+        "type": "phone",
+        "brand": "Apple",
+        "model": "13 Pro",
+        "condition": "used",
+        "color": "Графит"
+      }
+    },
+    {
+      "id": "2",
+      "category": "electronics",
+      "title": "MacBook Air M2",
+      "price": 120000,
+      "createdAt": "2024-03-05T12:00:00Z",
+      "params": {
+        "type": "laptop",
+        "brand": "Apple",
+        "model": "Air M2"
+      }
+    },
+    {
+      "id": "3",
+      "category": "auto",
+      "title": "Toyota Camry 2020",
+      "description": "Один владелец, не бита, не крашена",
+      "price": 2500000,
+      "createdAt": "2024-02-20T09:00:00Z",
+      "params": {
+        "brand": "Toyota",
+        "model": "Camry",
+        "yearOfManufacture": 2020,
+        "transmission": "automatic",
+        "mileage": 45000,
+        "enginePower": 180
+      }
+    },
+    {
+      "id": "4",
+      "category": "auto",
+      "title": "Honda Civic",
+      "price": 1200000,
+      "createdAt": "2024-02-15T14:00:00Z",
+      "params": {
+        "brand": "Honda",
+        "model": "Civic",
+        "yearOfManufacture": 2018,
+        "transmission": "manual"
+      }
+    },
+    {
+      "id": "5",
+      "category": "real_estate",
+      "title": "2-комнатная квартира на Арбате",
+      "description": "Светлая квартира с евроремонтом",
+      "price": 15000000,
+      "createdAt": "2024-01-10T11:00:00Z",
+      "params": {
+        "type": "flat",
+        "address": "Москва, ул. Арбат, 12",
+        "area": 54,
+        "floor": 5
+      }
+    },
+    {
+      "id": "6",
+      "category": "real_estate",
+      "title": "Комната в общежитии",
+      "price": 1800000,
+      "createdAt": "2024-01-20T16:00:00Z",
+      "params": {
+        "type": "room",
+        "area": 18
+      }
+    }
+  ]
+}
