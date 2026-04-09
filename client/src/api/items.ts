@@ -1,6 +1,8 @@
 import { httpClient } from "./client";
 import type { Item, ItemsResponse, ItemUpdatePayload } from '../types'
 
+type AIRequestData = { title: string; category: string; params: unknown }
+
 export type GetItemsParams = {
     q?: string
     limit?: number
@@ -33,3 +35,8 @@ export const itemsApi = {
     update: (id: string, payload: ItemUpdatePayload): Promise<Item> =>
         httpClient.put<Item>(`/api/items/${id}`, payload)
 }
+
+export const aiApi = {
+    suggest: (type: 'description' | 'price', data: AIRequestData ) => 
+        httpClient.post<{ text: string }>(`/api/ai/suggest-${type}`, data),
+} 

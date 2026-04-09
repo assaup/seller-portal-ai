@@ -25,5 +25,7 @@ export const httpClient = {
     get: <T>(url: string, signal?: AbortSignal) => 
         request<T>(url, {method: 'GET', signal}),
     put: <T>(url: string, body?: unknown) =>
-        request<T>(url, {method: 'PUT', body})
+        request<T>(url, {method: 'PUT', body}),
+    post: <T>(url: string, body: unknown) =>
+        request<T>(url, { method: 'POST', body})
 }

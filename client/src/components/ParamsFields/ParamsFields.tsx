@@ -12,7 +12,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
     if (category === 'electronics'){
         return (
             <div>
-                <label>
+                <label className={styles.label}>
                     Тип
                     <select 
                         className={inputClass((params as ElectronicsParams).type)}
@@ -36,7 +36,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         placeholder="Бренд"
                     />
                 </label>
-                <label>
+                <label className={styles.label}>
                     Модель
                     <input 
                         className={inputClass((params as ElectronicsParams).model)}
@@ -46,7 +46,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         placeholder="Модель"
                     />
                 </label>
-                <label>
+                <label className={styles.label}>
                     Состояние
                     <select 
                         className={inputClass((params as ElectronicsParams).condition)}
@@ -59,7 +59,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         <option value="used">Б/У</option>
                     </select>
                 </label>
-                <label>
+                <label className={styles.label}>
                     Цвет
                     <input 
                         className={inputClass((params as ElectronicsParams).color)}
@@ -76,7 +76,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
     if (category === 'auto'){
         return (
             <div>
-                <label>
+                <label className={styles.label}>
                     Бренд
                     <input 
                         className={inputClass((params as AutoParams).brand)}
@@ -86,7 +86,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         onChange={(e) => onChange('brand', e.target.value)}
                     />
                 </label>
-                <label>
+                <label className={styles.label}>
                     Модель
                     <input 
                         className={inputClass((params as AutoParams).model)}
@@ -96,7 +96,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         onChange={(e) => onChange('model', e.target.value)}
                     />
                 </label>
-                <label>
+                <label className={styles.label}>
                     Год выпуска
                     <input 
                         className={inputClass((params as AutoParams).yearOfManufacture)}
@@ -106,7 +106,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         onChange={(e) => onChange('yearOfManufacture', Number(e.target.value))}
                     />
                 </label>
-                <label>
+                <label className={styles.label}>
                     Коробка передач
                     <select 
                         className={inputClass((params as AutoParams).transmission)}
@@ -119,7 +119,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         <option value="manual">Механика</option>
                     </select>
                 </label>
-                <label>
+                <label className={styles.label}>
                     Пробег, км
                     <input 
                         className={inputClass((params as AutoParams).mileage)}
@@ -129,7 +129,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         onChange={(e) => onChange('mileage', Number(e.target.value))}
                     />
                 </label>
-                <label>
+                <label className={styles.label}>
                     Мощность двигателя, л.с
                     <input 
                         className={inputClass((params as AutoParams).enginePower)}
@@ -145,7 +145,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
     if (category === 'real_estate'){
         return (
             <div>
-                <label>
+                <label className={styles.label}>
                     Тип
                     <select 
                         className={inputClass((params as RealEstateParams).type)}
@@ -159,7 +159,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         <option value="room">Комната</option>
                     </select>
                 </label>
-                <label>
+                <label className={styles.label}>
                     Адрес
                     <input 
                         className={inputClass((params as RealEstateParams).address)}
@@ -169,7 +169,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         onChange={(e) => onChange('address', e.target.value)}
                     />
                 </label>
-                <label>
+                <label className={styles.label}>
                     Площадь, м²
                     <input 
                         className={inputClass((params as RealEstateParams).area)}
@@ -179,7 +179,7 @@ const ParamsFields = ({category, params, onChange}: Props) => {
                         onChange={(e) => onChange('area', Number(e.target.value))}
                     />
                 </label>
-                <label>
+                <label className={styles.label}>
                     Этаж
                     <input 
                         className={inputClass((params as RealEstateParams).floor)}

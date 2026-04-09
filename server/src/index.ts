@@ -5,6 +5,7 @@ import { readFileSync } from 'fs'
 import path from 'path'
 import type { DB } from './types'
 import itemsRouter from './routes/items'
+import aiRouter from './routes/ai'
 
 const app = express()
 const PORT = process.env.PORT ?? 8080
@@ -18,6 +19,8 @@ export function getDB(): DB {
 }
 
 app.use('/items', itemsRouter)
+app.use('/ai', aiRouter)
+
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
