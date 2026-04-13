@@ -101,7 +101,7 @@ const AdViewPage = () => {
             <p className="desc">{data.description}</p>
           </div>
           <div>
-            {data.needsRevision && (
+            {emptyFields.length > 0 && (
               <div className={styles.needsRevision}>
               <svg 
                 width="16" 
