@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useFetch } from "../../hooks/useFetch";
 import { aiApi, itemsApi } from "../../api/items";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Item, ItemUpdatePayload } from "../../types";
 import ParamsFields from "../../components/ParamsFields/ParamsFields";
 import LampIcon from "../../components/icons/LampIcon";
@@ -42,6 +42,9 @@ const AdEditPage = () => {
   const navigate = useNavigate();
   const descriptionAI = useAI();
   const priceAI = useAI();
+  
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
 
   if (loading) return <p>Загрузка...</p>;
   if (error) return <p>Ошибка: {error}</p>;
@@ -115,6 +118,13 @@ const AdEditPage = () => {
 
   const isValid = !!currentForm.title && !!currentForm.price;
 
+  const adjustHeight = () => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height='auto'
+    el.style.height = `{el.scrollHeight}px`
+  }
+
   return (
     <div className={styles.layout}>
       {toast && <Toast message={toast.message} type={toast.type} />}
@@ -152,43 +162,47 @@ const AdEditPage = () => {
         </label>
 
         <span className={styles.line}></span>
+        <div className={styles.price}>
+          <label className={styles.label}>
+            <span className={styles.text}>Цена</span>
+            <input
+              className={inputClass("price", currentForm.price, true)}
+              type="number"
+              name="price"
+              value={currentForm?.price}
+              onChange={(e) => handleChange("price", Number(e.target.value))}
+              onBlur={() => handleBlur("price")}
+            />
+            {touched.price && !currentForm.price && (
+              <span className={styles.fieldError}>Поле обязательно</span>
+            )}
+          </label>
 
-        <label className={styles.label}>
-          <span className={styles.text}>Цена</span>
-          <input
-            className={inputClass("price", currentForm.price, true)}
-            type="number"
-            name="price"
-            value={currentForm?.price}
-            onChange={(e) => handleChange("price", Number(e.target.value))}
-            onBlur={() => handleBlur("price")}
-          />
-          {touched.price && !currentForm.price && (
-            <span className={styles.fieldError}>Поле обязательно</span>
-          )}
-        </label>
+          <button
+            className={`${styles.btn} ${styles.btn__needsRevision}`}
+            type="button"
+            onClick={() =>
+              priceAI.request(async () => {
+                const res = await aiApi.suggest('price', { 
+                  title: currentForm.title,
+                  category: currentForm.category,
+                  params: currentForm.params });
+                return res.text;
+              })
+            }
+          >
+            <LampIcon />
+            {priceAI.loading ? "Выполняется запрос..." : "Узнать рыночную цену"}
+          </button>
 
-        <button
-          className={`${styles.btn} ${styles.btn__needsRevision}`}
-          type="button"
-          onClick={() =>
-            priceAI.request(async () => {
-              const res = await aiApi.suggest('price', { 
-                title: currentForm.title,
-                category: currentForm.category,
-                params: currentForm.params });
-              return res.text;
-            })
-          }
-        >
-          <LampIcon />
-          {priceAI.loading ? "Выполняется запрос..." : "Узнать рыночную цену"}
-        </button>
-
-        <AITooltip
-          {...priceAI}
-          onClose={priceAI.clear}
-        />
+          <div className={styles.tooltip}>
+            <AITooltip
+              {...priceAI}
+              onClose={priceAI.clear}
+            />
+          </div>
+        </div>
+        
 
         <span className={styles.line}></span>
 
@@ -204,10 +218,12 @@ const AdEditPage = () => {
         <label className={styles.label}>
           Описание
           <textarea
+            ref={textareaRef}
             className={`${inputClass("description", currentForm.description)} ${styles.input__textarea}`}
             name="description"
             value={currentForm?.description}
             onChange={(e) => handleChange("description", e.target.value)}
+            onInput={adjustHeight}
           ></textarea>
         </label>
 
@@ -232,12 +248,12 @@ const AdEditPage = () => {
               ? "Улучшить описание"
               : "Придумать описание"}
         </button>
-
         <AITooltip
           {...descriptionAI}
           onApply={(text) => {
             handleChange("description", text);
             descriptionAI.clear();
+            setTimeout(adjustHeight, 0)
           }}
           onClose={descriptionAI.clear}
         />

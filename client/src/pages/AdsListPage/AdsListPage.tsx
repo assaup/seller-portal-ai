@@ -168,7 +168,9 @@ const AdsListPage = () => {
             {error && <p className={styles.error}>Ошибка: {error}</p>}
 
             {!loading && !error && data?.items.length === 0 && (
-              <p className={styles.message}>Ошибка: Объявления не найдены</p>
+              <div className={styles.message}>
+                <p className={styles.message__text}>Объявления не найдены</p>
+              </div>
             )}
 
             {data && (

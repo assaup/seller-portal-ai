@@ -49,8 +49,16 @@ const AdViewPage = () => {
 
   const emptyFields:string[] = []
   if (!data.description) emptyFields.push('Описание')
-  Object.entries(data.params).forEach(([key, val]) => {
-    if (!val) emptyFields.push(paramsToRu[key] ?? key)
+
+  const params = data.params as Record<string, unknown>
+  const allParamKeys: Record<string, string[]> = {
+    electronics: ['type', 'brand', 'model', 'condition', 'color'],
+    auto: ['brand', 'model', 'yearOfManufacture', 'transmission', 'mileage', 'enginePower'],
+    real_estate: ['type', 'address', 'area', 'floor'],
+  }
+
+  allParamKeys[data.category].forEach((key) => {
+    if (!params[key]) emptyFields.push(paramsToRu[key] ?? [key])
   })
 
 
@@ -78,13 +86,12 @@ const AdViewPage = () => {
             <div className={styles.info__rightWrapper}>
               <strong className={styles.price}>{data.price.toLocaleString('ru-RU')} ₽</strong>
               <p className={styles.date}>Опубликовано: {formatted}</p>
-              <p className={styles.date}>Отредактировано: {formatted}</p>
             </div>
           </div>
           <span className={styles.line}></span>
         </section>
         <section className={styles.content}>
-          <div>
+          <div className={styles.leftWrapper}>
             <img 
               src={`https://placehold.co/300x200?text=${encodeURIComponent(data.title)}`} 
               alt={data.title}

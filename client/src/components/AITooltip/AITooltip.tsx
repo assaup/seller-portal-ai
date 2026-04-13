@@ -15,7 +15,7 @@ const AITooltip = (props: Props) => {
         error,
         result,
         onApply,
-        onClose
+        onClose,
     } = props
 
     if (!loading && !error && !result) return null
@@ -34,9 +34,9 @@ const AITooltip = (props: Props) => {
                 <p className={styles.result}>{result}</p>
                 <div className={styles.actions}>
                     {onApply && (
-                        <button onClick={() => onApply(result)}>Применить</button>
+                        <button className={`${styles.btn} ${styles.btn_apply}`} onClick={() => onApply(result)}>Применить</button>
                     )}
-                    <button onClick={onClose}>Закрыть</button>
+                    <button className={styles.btn} onClick={onClose}>Закрыть</button>
                 </div>
                 </>
             )}
