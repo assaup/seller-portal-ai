@@ -3,10 +3,22 @@ import { writeFileSync } from 'fs'
 import path from 'path'
 import { getDB } from '../index'
 import { checkNeedsRevision } from '../utils/needsRevision'
-import type { Item } from '../types'
+import type { Item, Category } from '../types'
 
 const router = Router()
 const DB_PATH = path.join(__dirname, '../db.json')
+const VALID_CATEGORIES: Category[] = ['auto', 'real_estate', 'electronics']
+
+function validateUpdateBody(body: unknown): body is Omit<Item, 'id' | 'createdAt' | 'imageUrl'> {
+    if (!body || typeof body !== 'object') return false
+    const b = body as Record<string, unknown>
+    if (!VALID_CATEGORIES.includes(b.category as Category)) return false
+    if (typeof b.title !== 'string' || b.title.trim() === '') return false
+    if (typeof b.price !== 'number' || b.price <= 0) return false
+    if (b.description !== undefined && typeof b.description !== 'string') return false
+    if (!b.params || typeof b.params !== 'object') return false
+    return true
+} 
 
 router.get('/', (req, res) => {
     const db = getDB()
@@ -47,7 +59,7 @@ router.get('/', (req, res) => {
             const bVal = b[sortColumn]
 
             if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1
-            if (aVal > bVal) return sortDirection === 'desc' ? 1 : -1
+            if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1
             return 0
         })
     }
@@ -90,6 +102,11 @@ router.get('/:id', (req, res) => {
 })
 
 router.put('/:id', (req, res) => {
+    if (!validateUpdateBody(req.body)) {
+        res.status(400).json({ error: 'Invalid request body' })
+        return
+    }
+
     const db = getDB()
     const index = db.items.findIndex((i) => i.id === req.params.id)
 
@@ -98,14 +115,18 @@ router.put('/:id', (req, res) => {
         return
     }
 
-    const updated:Item ={
+    const { category, title, description, price, params } = req.body
+    const updated: Item = {
         ...db.items[index],
-        ...req.body,
-        id: req.params.id
+        category,
+        title,
+        description,
+        price,
+        params,
+        id: req.params.id,
     }
 
     db.items[index] = updated
-
     writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf-8')
 
     res.json({

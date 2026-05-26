@@ -9,8 +9,9 @@ import aiRouter from './routes/ai'
 
 const app = express()
 const PORT = process.env.PORT ?? 8080
+const CLIENT_URL = process.env.CLIENT_URL ?? 'http://localhost:5173'
 
-app.use(cors())
+app.use(cors({ origin: CLIENT_URL}))
 app.use(express.json())
 
 export function getDB(): DB {

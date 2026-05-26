@@ -8,10 +8,10 @@
       "price": 65000,
       "createdAt": "2024-03-01T10:00:00Z",
       "params": {
-        "type": "Телефон",
+        "type": "phone",
         "brand": "Apple",
         "model": "",
-        "condition": "Б/у",
+        "condition": "used",
         "color": ""
       }
     },
@@ -41,7 +41,7 @@
         "brand": "Toyota",
         "model": "Camry",
         "yearOfManufacture": 2020,
-        "transmission": "Автомат",
+        "transmission": "automatic",
         "mileage": 45000,
         "enginePower": 180
       }
@@ -62,7 +62,7 @@
       "price": 120000000,
       "createdAt": "2024-01-10T11:00:00Z",
       "params": {
-        "type": "Квартира",
+        "type": "flat",
         "address": "Москва, ул. Арбат, 12",
         "area": 540,
         "floor": 9
@@ -75,7 +75,7 @@
       "price": 1800000,
       "createdAt": "2024-01-20T16:00:00Z",
       "params": {
-        "type": "Комната",
+        "type": "room",
         "area": 18,
         "address": ""
       },
@@ -89,10 +89,10 @@
       "price": 55000,
       "createdAt": "2024-03-10T09:00:00Z",
       "params": {
-        "type": "Телефон",
+        "type": "phone",
         "brand": "Samsung",
         "model": "Galaxy S23",
-        "condition": "Новый",
+        "condition": "new",
         "color": "Чёрный"
       }
     },
@@ -103,7 +103,7 @@
       "price": 89000,
       "createdAt": "2024-03-08T14:00:00Z",
       "params": {
-        "type": "Другое",
+        "type": "misc",
         "brand": "Apple",
         "model": "iPad Pro 12.9"
       },
@@ -120,7 +120,7 @@
         "brand": "Kia",
         "model": "Sportage",
         "yearOfManufacture": 2021,
-        "transmission": "Автомат",
+        "transmission": "automatic",
         "mileage": 32000,
         "enginePower": 177
       }
@@ -135,7 +135,7 @@
         "brand": "Lada",
         "model": "Vesta",
         "yearOfManufacture": 2019,
-        "transmission": "Механика"
+        "transmission": "manual"
       }
     },
     {
@@ -146,7 +146,7 @@
       "price": 5200000,
       "createdAt": "2024-03-12T13:00:00Z",
       "params": {
-        "type": "Квартира",
+        "type": "flat",
         "address": "Москва, ул. Ленина, 45",
         "area": 28,
         "floor": 12
@@ -160,7 +160,7 @@
       "price": 12000000,
       "createdAt": "2024-02-05T09:00:00Z",
       "params": {
-        "type": "Дом",
+        "type": "house",
         "address": "Московская обл., г. Пушкино",
         "area": 120,
         "floor": 2
@@ -174,10 +174,10 @@
       "price": 45000,
       "createdAt": "2024-03-15T16:00:00Z",
       "params": {
-        "type": "Другое",
+        "type": "misc",
         "brand": "Sony",
         "model": "PlayStation 5",
-        "condition": "Б/у",
+        "condition": "used",
         "color": ""
       }
     },
@@ -192,7 +192,7 @@
         "brand": "BMW",
         "model": "3 Series",
         "yearOfManufacture": 2019,
-        "transmission": "Автомат",
+        "transmission": "automatic",
         "mileage": 58000,
         "enginePower": 258
       }
@@ -204,7 +204,7 @@
       "price": 18500000,
       "createdAt": "2024-02-28T10:00:00Z",
       "params": {
-        "type": "Квартира",
+        "type": "flat",
         "address": "Москва, Парковая ул., 7",
         "area": 78
       }
@@ -217,10 +217,10 @@
       "price": 75000,
       "createdAt": "2024-03-18T11:00:00Z",
       "params": {
-        "type": "Ноутбук",
+        "type": "laptop",
         "brand": "Lenovo",
         "model": "ThinkPad X1",
-        "condition": "Б/у",
+        "condition": "used",
         "color": "Чёрный"
       }
     }
