@@ -30,7 +30,11 @@ router.post('/suggest-description', async (req, res) =>{
                 }
             ]
         })
-    const text = completion.choices[0].message.content
+    const text = completion.choices[0]?.message?.content
+    if (!text) {
+        res.status(502).json({ error: 'Пустой ответ от AI' })
+        return
+    }
     res.json({ text })
     } catch(err) {
         console.error(err)
@@ -73,10 +77,14 @@ router.post('/suggest-price', async (req, res) => {
             }
         ]
     })
-    const text = completion.choices[0].message.content
+    const text = completion.choices[0]?.message?.content
+    if (!text) {
+        res.status(502).json({ error: 'Пустой ответ от AI' })
+        return
+    }
     res.json({ text })
     } catch(err) {
-        console.log(err)
+        console.error(err)
         res.status(500).json({ error: 'Ошибка генерации' })
     }
 })

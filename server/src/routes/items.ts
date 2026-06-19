@@ -1,12 +1,9 @@
 import { Router } from 'express'
-import { writeFileSync } from 'fs'
-import path from 'path'
-import { getDB } from '../index'
+import { pool, SELECT_COLS } from '../db'
 import { checkNeedsRevision } from '../utils/needsRevision'
 import type { Item, Category } from '../types'
 
 const router = Router()
-const DB_PATH = path.join(__dirname, '../db.json')
 const VALID_CATEGORIES: Category[] = ['auto', 'real_estate', 'electronics']
 
 function validateUpdateBody(body: unknown): body is Omit<Item, 'id' | 'createdAt' | 'imageUrl'> {
@@ -18,121 +15,128 @@ function validateUpdateBody(body: unknown): body is Omit<Item, 'id' | 'createdAt
     if (b.description !== undefined && typeof b.description !== 'string') return false
     if (!b.params || typeof b.params !== 'object') return false
     return true
-} 
+}
 
-router.get('/', (req, res) => {
-    const db = getDB()
-    let items = db.items
+// Строка из БД -> клиентский Item (created_at приходит как Date)
+type Row = Omit<Item, 'createdAt'> & { createdAt: Date | string }
 
+function toItem(row: Row): Item {
+    return {
+        ...row,
+        createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : row.createdAt,
+    }
+}
+
+router.get('/', async (req, res) => {
+    const conditions: string[] = []
+    const values: unknown[] = []
 
     // Поиск по названию
-    const q = req.query.q as string || undefined
+    const q = req.query.q as string | undefined
     if (q) {
-        items = items.filter((item) =>
-            item.title.toLowerCase().includes(q.toLowerCase())
-        )
+        values.push(`%${q}%`)
+        conditions.push(`title ILIKE $${values.length}`)
     }
 
-
-    // Фильтр по категориям 
-    const categories = req.query.categories as string || undefined
+    // Фильтр по категориям
+    const categories = req.query.categories as string | undefined
     if (categories) {
-        const list = categories.split(',')
-        items = items.filter((item) => list.includes(item.category))
+        values.push(categories.split(','))
+        conditions.push(`category = ANY($${values.length})`)
     }
 
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
 
-    // Фильтр needsRevision
-    const needsRevision = req.query.needsRevision as string || undefined
-    if (needsRevision === 'true'){
-        items = items.filter((item) => checkNeedsRevision(item))
-    } 
+    // Сортировка (whitelist колонок и направления)
+    const sortColumn =
+        req.query.sortColumn === 'title' ? 'title'
+        : req.query.sortColumn === 'createdAt' ? 'created_at'
+        : null
+    const sortDirection = req.query.sortDirection === 'desc' ? 'DESC' : 'ASC'
+    const orderBy = sortColumn ? `ORDER BY ${sortColumn} ${sortDirection}` : ''
 
+    try {
+        const { rows } = await pool.query<Row>(
+            `SELECT ${SELECT_COLS} FROM items ${where} ${orderBy}`,
+            values
+        )
+        let items = rows.map(toItem)
 
-    // Сортировка
-    const sortColumn = req.query.sortColumn as 'title' | 'createdAt' | undefined
-    const sortDirection = req.query.sortDirection as 'asc' | 'desc' | undefined
+        // Фильтр needsRevision вычисляется в коде (зависит от заполненности params)
+        const needsRevision = req.query.needsRevision as string | undefined
+        if (needsRevision === 'true') {
+            items = items.filter(checkNeedsRevision)
+        }
 
-    if (sortColumn){
-        items = items.sort((a, b) => {
-            const aVal = a[sortColumn]
-            const bVal = b[sortColumn]
+        // Пагинация
+        const skip = parseInt(req.query.skip as string) || 0
+        const limit = parseInt(req.query.limit as string) || 10
 
-            if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1
-            if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1
-            return 0
+        const total = items.length
+        const paginated = items.slice(skip, skip + limit)
+
+        res.json({
+            items: paginated.map((item) => ({
+                id: item.id,
+                category: item.category,
+                title: item.title,
+                price: item.price,
+                imageUrl: item.imageUrl,
+                needsRevision: checkNeedsRevision(item),
+            })),
+            total,
         })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Database error' })
     }
-
-    // Пагинация
-    const skip = parseInt(req.query.skip as string) || 0
-    const limit = parseInt(req.query.limit as string) || 10
-
-    const total = items.length
-    const paginated = items.slice(skip, skip + limit)
-
-    res.json({
-        items: paginated.map((item) => ({
-            id: item.id,
-            category: item.category,
-            title: item.title,
-            price: item.price,
-            imageUrl: item.imageUrl,
-            needsRevision: checkNeedsRevision(item),
-        })),
-        total,
-    })
 })
 
 // GET /items/:id
-router.get('/:id', (req, res) => {
-    const db = getDB()
-    const item = db.items.find((i) => i.id === req.params.id)
-
-    if (!item){
-        res.status(404).json({error: 'Item not found'})
-        return
+router.get('/:id', async (req, res) => {
+    try {
+        const { rows } = await pool.query<Row>(
+            `SELECT ${SELECT_COLS} FROM items WHERE id = $1`,
+            [req.params.id]
+        )
+        if (rows.length === 0) {
+            res.status(404).json({ error: 'Item not found' })
+            return
+        }
+        const item = toItem(rows[0])
+        res.json({ ...item, needsRevision: checkNeedsRevision(item) })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Database error' })
     }
-
-    res.json({
-        ...item,
-        needsRevision: checkNeedsRevision(item)
-    })
-
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     if (!validateUpdateBody(req.body)) {
         res.status(400).json({ error: 'Invalid request body' })
         return
     }
 
-    const db = getDB()
-    const index = db.items.findIndex((i) => i.id === req.params.id)
-
-    if (index === -1){
-        res.status(404).json({error: 'Item not found'})
-        return
-    }
-
     const { category, title, description, price, params } = req.body
-    const updated: Item = {
-        ...db.items[index],
-        category,
-        title,
-        description,
-        price,
-        params,
-        id: req.params.id,
+
+    try {
+        const { rows } = await pool.query<Row>(
+            `UPDATE items
+             SET category = $1, title = $2, description = $3, price = $4, params = $5
+             WHERE id = $6
+             RETURNING ${SELECT_COLS}`,
+            [category, title, description ?? null, price, JSON.stringify(params), req.params.id]
+        )
+        if (rows.length === 0) {
+            res.status(404).json({ error: 'Item not found' })
+            return
+        }
+        const item = toItem(rows[0])
+        res.json({ ...item, needsRevision: checkNeedsRevision(item) })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Database error' })
     }
-
-    db.items[index] = updated
-    writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf-8')
-
-    res.json({
-        ...updated,
-        needsRevision: checkNeedsRevision(updated)
-    })
 })
 
 export default router

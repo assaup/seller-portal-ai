@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      // Сервер монтирует роуты под /api, поэтому префикс не срезаем
       '/api': {
-        target: 'http://localhost:3001',
+        target: process.env.VITE_API_TARGET ?? 'http://localhost:3001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }

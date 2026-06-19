@@ -1,32 +1,43 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import { readFileSync } from 'fs'
 import path from 'path'
-import type { DB } from './types'
+import { existsSync } from 'fs'
+import { initDB } from './db'
 import itemsRouter from './routes/items'
 import aiRouter from './routes/ai'
 
 const app = express()
-const PORT = process.env.PORT ?? 8080
+const PORT = Number(process.env.PORT ?? 3001)
 const CLIENT_URL = process.env.CLIENT_URL ?? 'http://localhost:5173'
 
-app.use(cors({ origin: CLIENT_URL}))
+app.use(cors({ origin: CLIENT_URL }))
 app.use(express.json())
 
-export function getDB(): DB {
-    const raw = readFileSync(path.join(__dirname, 'db.json'), 'utf-8')
-    return JSON.parse(raw)
-}
+app.use('/api/items', itemsRouter)
+app.use('/api/ai', aiRouter)
 
-app.use('/items', itemsRouter)
-app.use('/ai', aiRouter)
-
-
-app.get('/health', (_req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
-})
+// В продакшене сервер раздаёт собранный клиент с того же origin
+const clientDir = path.join(__dirname, 'public')
+if (existsSync(clientDir)) {
+  app.use(express.static(clientDir))
+  // SPA fallback: всё, что не /api, отдаёт index.html
+  app.get(/^(?!\/api).*/, (_req, res) => {
+    res.sendFile(path.join(clientDir, 'index.html'))
+  })
+}
+
+initDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`)
+    })
+  })
+  .catch((err) => {
+    console.error('DB init failed', err)
+    process.exit(1)
+  })
