@@ -3,6 +3,7 @@ import Groq from 'groq-sdk'
 
 
 const router = Router()
+const GROQ_MODEL = process.env.GROQ_MODEL ?? 'openai/gpt-oss-120b'
 
 // Клиент создаём лениво: без ключа сервер должен стартовать, падают только AI-роуты
 let groqClient: Groq | null = null
@@ -28,7 +29,7 @@ router.post('/suggest-description', async (req, res) =>{
         : 'Параметры не указаны';
     try {
         const completion = await getGroq()!.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
+            model: GROQ_MODEL,
             messages: [
                 {
                     role: 'user',
@@ -64,7 +65,7 @@ router.post('/suggest-price', async (req, res) => {
         : 'Параметры не указаны';
     try {
         const completion = await getGroq()!.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+        model: GROQ_MODEL,
         messages: [
             {
                 role: 'user',
