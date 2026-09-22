@@ -3,7 +3,22 @@ import Groq from 'groq-sdk'
 
 
 const router = Router()
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+
+// Клиент создаём лениво: без ключа сервер должен стартовать, падают только AI-роуты
+let groqClient: Groq | null = null
+function getGroq(): Groq | null {
+    if (!process.env.GROQ_API_KEY) return null
+    groqClient ??= new Groq({ apiKey: process.env.GROQ_API_KEY })
+    return groqClient
+}
+
+router.use((_req, res, next) => {
+    if (!getGroq()) {
+        res.status(503).json({ error: 'AI недоступен: не задан GROQ_API_KEY' })
+        return
+    }
+    next()
+})
 
 
 router.post('/suggest-description', async (req, res) =>{
@@ -12,7 +27,7 @@ router.post('/suggest-description', async (req, res) =>{
         ? Object.entries(params).map(([key, val]) => `${key}: ${val}`).join('\n')
         : 'Параметры не указаны';
     try {
-        const completion = await groq.chat.completions.create({
+        const completion = await getGroq()!.chat.completions.create({
             model: 'llama-3.3-70b-versatile',
             messages: [
                 {
@@ -48,7 +63,7 @@ router.post('/suggest-price', async (req, res) => {
         ? Object.entries(params).map(([key, val]) => `${key}: ${val}`).join('\n')
         : 'Параметры не указаны';
     try {
-        const completion = await groq.chat.completions.create({
+        const completion = await getGroq()!.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
         messages: [
             {

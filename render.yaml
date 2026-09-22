@@ -1,0 +1,15 @@
+# Render Blueprint: Dashboard → New → Blueprint → выбрать этот репозиторий
+# БД — внешняя (Neon), строку подключения вводим при создании
+services:
+  - type: web
+    name: smart-showcase
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false

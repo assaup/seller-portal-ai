@@ -7,6 +7,12 @@ export const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
 })
 
+// Облачный Postgres (Neon) может закрывать простаивающие соединения —
+// без обработчика такая ошибка idle-клиента роняет процесс
+pool.on('error', (err) => {
+    console.error('Postgres idle client error', err)
+})
+
 // Колонки для SELECT с приведением к форме клиентского Item (camelCase, price как number)
 export const SELECT_COLS =
     `id, category, title, description, price::float8 AS price, ` +

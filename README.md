@@ -69,6 +69,19 @@ docker compose up --build
 При первом запуске схема создаётся автоматически, а БД наполняется из `server/src/db.json`.
 Данные хранятся в Docker-томе `pgdata` и переживают перезапуск контейнеров.
 
+## Деплой (Render + Neon)
+
+Приложение собирается из `Dockerfile` на Render, БД — бесплатный Postgres на Neon.
+
+1. **Neon:** создай проект на [neon.tech](https://neon.tech) и скопируй connection string
+   (вида `postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require`).
+2. **Render:** Dashboard → New → Blueprint → выбери этот репозиторий (подхватится `render.yaml`).
+3. Заполни переменные: `DATABASE_URL` — строка из Neon, `GROQ_API_KEY` — ключ Groq.
+4. После деплоя таблица создастся и наполнится автоматически. Проверка: `https://<сервис>.onrender.com/api/health`.
+
+Без `GROQ_API_KEY` приложение работает, AI-эндпоинты отвечают 503.
+На бесплатном плане Render сервис засыпает после 15 минут простоя — первый запрос после этого идёт ~30–60 секунд.
+
 ## Локальная разработка (без Docker)
 
 ### Требования
